@@ -15,10 +15,10 @@ export const loginUser = createAsyncThunk<authI, any>(
       if (!accessToken) throw new Error("No access token returned");
       if (!refreshToken) throw new Error("No refresh token returned");
 
-      localStorage.setItem("token", accessToken);
+      localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
-      return response.data.user as authI;
+      return response.data.data.user as authI;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);
     }
@@ -49,11 +49,21 @@ export const logoutUser = createAsyncThunk<void>(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
     } catch (err: any) {
-      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       return rejectWithValue(err.response?.data || err.message);
+    }
+  })
+
+  export const profile = createAsyncThunk<authI, void>("auth/me", async(_,{rejectWithValue})=>{
+    try {
+      const response = await api.get("/auth/me")
+      return response.data.data
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+      
     }
   })

@@ -27,9 +27,20 @@ export default function AdminDashboard() {
   // Toggle forms
   const [showProductForm, setShowProductForm] = useState(false);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<{id: string, name: string} | null>(null);
   const [showVariantForm, setShowVariantForm] = useState(false);
   const [showSizeForm, setShowSizeForm] = useState(false);
   const [showColorForm, setShowColorForm] = useState(false);
+
+
+  const handleAddCategory = () => {
+    setEditingCategory(null)
+    setShowCategoryForm(!showCategoryForm)
+  }
+  const handleEditCategory = (category:{id:string; name:string;}) => {
+    setEditingCategory(category)
+    setShowCategoryForm(true)
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -78,13 +89,13 @@ export default function AdminDashboard() {
         {/* Categories */}
         <div>
           <button
-            onClick={() => setShowCategoryForm(!showCategoryForm)}
+            onClick={handleAddCategory}
             className="mb-2 bg-blue-500 text-white px-4 py-2 rounded"
           >
             {showCategoryForm ? "Close Category Form" : "Add Category"}
           </button>
-          {showCategoryForm && <CategoryForm onSubmit={(data) => console.log(data)} />}
-          <CategoryList />
+          {showCategoryForm && <CategoryForm initialData={editingCategory} />}
+          <CategoryList handleEditCategory = {handleEditCategory} />
         </div>
 
         {/* Variants */}

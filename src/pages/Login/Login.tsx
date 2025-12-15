@@ -23,7 +23,11 @@ const Login = () => {
       const resultAction = await dispatch(loginUser({ email, password }));
 
       if (loginUser.fulfilled.match(resultAction)) {
-        navigate("/", { replace: true });
+        if(resultAction.payload.role === "admin"){
+          return navigate("/admin", {replace: true})
+        }else{
+          return navigate("/", { replace: true });
+        }
       } else {
         console.error("Login failed:", resultAction.payload);
       }

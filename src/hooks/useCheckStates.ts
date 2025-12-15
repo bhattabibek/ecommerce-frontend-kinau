@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useNavigationType } from "react-router-dom";
 
 export const useRedirectIfLoggedIn = (fallback?: string) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     const navigate = useNavigate();
     const navigationType = useNavigationType()
 
@@ -19,6 +19,6 @@ export const useRedirectIfLoggedIn = (fallback?: string) => {
 }
 
 export const useHasToken = () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     return !!token;
 }

@@ -18,6 +18,8 @@ import AuthGuard from "@/providers/auth.provider";
 
 import { Suspense } from "react";
 import { Outlet, useRoutes } from "react-router-dom";
+import AdminPage from "@/pages/Adminpage";
+import AdminLayout from "@/layout/AdminLayout";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -103,6 +105,19 @@ const AppRoutes = () => {
         { path: "*", element: <>Not Found</> },
       ],
     },
+    {
+      path:"/admin",
+      element:(
+        <Suspense fallback={<h1>Loading...</h1>}>
+          <AdminLayout>
+            <Outlet/>
+          </AdminLayout>
+        </Suspense>
+      ),
+      children:[
+        {index: true, element:<AdminPage/>},
+      ]
+    }
   ]);
 
   return routes;

@@ -1,20 +1,34 @@
 // components/admin/Category/CategoryForm.tsx
+import { addCategories } from "@/redux/features/category.slice";
+import { createCategory } from "@/redux/thunk/category.thunk";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 
 interface CategoryFormProps {
-  onSubmit: (data: CategoryData) => void;
-  initialData?: { name: string };
+  initialData?: { id: string; name: string } | null;
 }
 interface CategoryData{
   name:string;
 }
 
-export default function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
+export default function CategoryForm({ initialData }: CategoryFormProps) {
+  const dispatch = useDispatch<any>();
   const [name, setName] = useState(initialData?.name || "");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name });
+
+    try {
+      const resultAction = await dispatch(createCategory({name}))
+      if(createCategory.fulfilled.match(resultAction)) {
+        dispatch(addCategories(resultAction.payload))
+        alert("category created")
+      }else {
+        console.error("Failed to create category:", resultAction)
+      }
+    } catch (error: any) {
+      console.log("Failed:", error)
+    }
   };
 
   return (

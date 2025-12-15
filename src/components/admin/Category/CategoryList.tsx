@@ -1,13 +1,32 @@
 // components/admin/Category/CategoryList.tsx
-import React from "react";
+import type { RootState } from "@/redux/root-reducer";
+import type { AppDispatch } from "@/redux/store";
+import { deleteCategory, getAllCategory } from "@/redux/thunk/category.thunk";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-const dummyCategories = [
-  { id: 1, name: "Clothing" },
-  { id: 2, name: "Footwear" },
-];
+export default function CategoryList({handleEditCategory}: any) {
+  const dispatch = useDispatch<AppDispatch>();
+    const { categories, isLoading, error } = useSelector(
+  (state: RootState) => state.categories
+  );
+  useEffect(()=>{
+    dispatch(getAllCategory())
+  },[dispatch])
 
-export default function CategoryList() {
-  return (
+  const handleDeleteCategory = (id: string)=>{
+    dispatch(deleteCategory(id))
+  }
+
+ if (isLoading) {
+    return <p>Loading categories...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-500">Failed to load categories</p>;
+  }
+
+ return (
     <div className="bg-white p-4 rounded-2xl shadow">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Categories</h2>
@@ -15,6 +34,7 @@ export default function CategoryList() {
           Add Category
         </button>
       </div>
+
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-100">
@@ -22,15 +42,16 @@ export default function CategoryList() {
             <th className="p-2 border">Actions</th>
           </tr>
         </thead>
+
         <tbody>
-          {dummyCategories.map((c) => (
+          {categories.map((c) => (
             <tr key={c.id} className="hover:bg-gray-50">
               <td className="p-2 border">{c.name}</td>
               <td className="p-2 border space-x-2">
-                <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                <button onClick={()=>handleEditCategory(c)} className="bg-blue-500 text-white px-3 py-1 rounded">
                   Edit
                 </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded">
+                <button onClick={()=>handleDeleteCategory(c.id)} className="bg-red-500 text-white px-3 py-1 rounded">
                   Delete
                 </button>
               </td>

@@ -1,9 +1,7 @@
 import type { baseInitialStateI } from "./baseInitialState.interface";
 
-export interface authI extends baseInitialStateI {
+export interface CategoryI extends baseInitialStateI {
   id: string;
   name: string;
-  phone: string;
-  email: string;
-  role: string;
+  description: string;
 }
