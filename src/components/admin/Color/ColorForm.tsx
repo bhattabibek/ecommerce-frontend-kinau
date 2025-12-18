@@ -1,23 +1,51 @@
 // src/components/admin/Color/ColorForm.tsx
+import { addColor, updateColorReducer } from "@/redux/features/color.slice";
+import type { AppDispatch } from "@/redux/store";
+import { createColor, updateColor } from "@/redux/thunk/color.thunk";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 
 interface ColorData {
+  _id: string;
   name: string;
-  hex: string;
+  hexCode: string;
 }
 
 interface ColorFormProps {
-  onSubmit: (data: ColorData) => void;
-  initialData?: ColorData;
+  initialData?: ColorData |null;
 }
 
-export default function ColorForm({ onSubmit, initialData }: ColorFormProps) {
+export default function ColorForm({ initialData }: ColorFormProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  
   const [name, setName] = useState(initialData?.name || "");
-  const [hex, setHex] = useState(initialData?.hex || "#000000");
+  const [hexCode, setHexCode] = useState(initialData?.hexCode || "#000000");
+  const isEditMode = Boolean(initialData?._id);
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, hex });
+    if(isEditMode){
+      const result = await dispatch(
+        updateColor({
+          _id: initialData!._id,
+          name,
+          hexCode,
+        })
+      )
+      if (updateColor.fulfilled.match(result)) {
+        dispatch(updateColorReducer(result.payload));
+        alert("Color updated");
+      }
+    }else {
+      try {
+        const resultAction = await dispatch(createColor({name, hexCode}))
+        dispatch(addColor(resultAction.payload))
+        alert("color created")
+      } catch (error: any) {
+        console.log("Failed:", error)
+      }
+    }
   };
 
   return (
@@ -42,12 +70,11 @@ export default function ColorForm({ onSubmit, initialData }: ColorFormProps) {
         <label className="block text-sm font-medium mb-1">Color Hex</label>
         <input
           type="color"
-          value={hex}
-          onChange={(e) => setHex(e.target.value)}
+          value={hexCode}
+          onChange={(e) => setHexCode(e.target.value)}
           className="w-16 h-10 border rounded cursor-pointer"
         />
       </div>
-
       <button
         type="submit"
         className="bg-blue-500 text-white px-4 py-2 rounded"

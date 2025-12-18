@@ -1,3 +1,5 @@
+import type { baseInitialStateI } from "./baseInitialState.interface"
+
 export interface productI  {
             "isWeeklyDeals": boolean,
             "isBestSeller": boolean,
@@ -28,3 +30,17 @@ export interface productI  {
             },
             "id": string
         }
+
+export interface SizeI extends baseInitialStateI{
+    _id: string;
+    name: string;
+    code: string;
+    description: string;
+}
+
+export interface ColorI extends baseInitialStateI {
+    _id: string;
+    name: string;
+    hexCode: string;
+    description: string;
+}

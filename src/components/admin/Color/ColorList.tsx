@@ -1,13 +1,28 @@
 // components/admin/Color/ColorList.tsx
-import React from "react";
+import type { RootState } from "@/redux/root-reducer";
+import type { AppDispatch } from "@/redux/store";
+import { deleteColor, getAllColor } from "@/redux/thunk/color.thunk";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-const dummyColors = [
-  { id: 1, name: "Red" },
-  { id: 2, name: "Blue" },
-  { id: 3, name: "Black" },
-];
+export default function ColorList({handleEditColor}: any) {
+  const dispatch = useDispatch<AppDispatch>();
+  const {isLoading,colors, error} = useSelector((state:RootState)=>state.color)
+  useEffect(()=> {
+    dispatch(getAllColor())
+  },[dispatch])
 
-export default function ColorList() {
+  const handleDeleteColor = (id: string)=>{
+    dispatch(deleteColor(id))
+  }
+  if (isLoading) {
+    return <p>Loading colors...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-500">Failed to load colors</p>;
+  }
+
   return (
     <div className="bg-white p-4 rounded-2xl shadow">
       <div className="flex justify-between items-center mb-4">
@@ -20,18 +35,20 @@ export default function ColorList() {
         <thead>
           <tr className="bg-gray-100">
             <th className="p-2 border">Name</th>
+            <th className="p-2 border">HexCode</th>
             <th className="p-2 border">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {dummyColors.map((c) => (
-            <tr key={c.id} className="hover:bg-gray-50">
+          {colors.map((c) => (
+            <tr key={c._id} className="hover:bg-gray-50">
               <td className="p-2 border">{c.name}</td>
+              <td className="p-2 border">{c.hexCode}</td>
               <td className="p-2 border space-x-2">
-                <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                <button onClick={()=>handleEditColor(c)} className="bg-blue-500 text-white px-3 py-1 rounded">
                   Edit
                 </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded">
+                <button onClick={()=>handleDeleteColor(c._id)} className="bg-red-500 text-white px-3 py-1 rounded">
                   Delete
                 </button>
               </td>

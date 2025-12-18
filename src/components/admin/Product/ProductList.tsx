@@ -1,11 +1,11 @@
 // components/admin/Product/ProductList.tsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProducts } from "@/redux/thunk/product.thunk";
+import { deleteProduct, getAllProducts } from "@/redux/thunk/product.thunk";
 import type { AppDispatch } from "@/redux/store";
 import type { RootState } from "@/redux/root-reducer";
 
-export default function ProductList() {
+export default function ProductList({handleEditProduct}: any) {
   const dispatch = useDispatch<AppDispatch>();
 
   const { products, isLoading, error } = useSelector(
@@ -15,6 +15,10 @@ export default function ProductList() {
   useEffect(() => {
     dispatch(getAllProducts());
   }, [dispatch]);
+
+  const handleDeleteProduct = (id: string)=>{
+      dispatch(deleteProduct(id))
+    }
 
   if (isLoading) {
     return <p>Loading products...</p>;
@@ -50,10 +54,10 @@ export default function ProductList() {
               <td className="p-2 border">NPR {p.price}</td>
               <td className="p-2 border">{p.category?.name}</td>
               <td className="p-2 border space-x-2">
-                <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                <button onClick={()=>handleEditProduct(p)} className="bg-blue-500 text-white px-3 py-1 rounded">
                   Edit
                 </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded">
+                <button onClick={()=>handleDeleteProduct(p._id)} className="bg-red-500 text-white px-3 py-1 rounded">
                   Delete
                 </button>
               </td>

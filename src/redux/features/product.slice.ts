@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllProducts } from "../thunk/product.thunk";
+import { deleteProduct, getAllProducts } from "../thunk/product.thunk";
 
 interface initialStateI {
   isLoading: boolean;
@@ -21,6 +21,12 @@ const productSlice = createSlice({
     reducers: {
         addProducts: (state, action)=> {
             state.products = action.payload
+        },
+        updateProductReducer: (state, action)=>{
+            const index = state.products.findIndex((product)=>product._id===action.payload._id)
+            if(index !== -1){
+                state.products[index] = action.payload;
+            }
         }
     },
     extraReducers: (builder) => {
@@ -36,9 +42,13 @@ const productSlice = createSlice({
       .addCase(getAllProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.error = (action.payload as string) || "Failed to load products";
-      });
+      })
+      .addCase(deleteProduct.fulfilled,(state, action)=>{
+        state.isLoading = false;
+        state.products = state.products.filter((p)=>p._id !== action.payload)
+      })
   },
 })
 
 export default productSlice.reducer;
-export const {addProducts} = productSlice.actions
+export const {addProducts, updateProductReducer} = productSlice.actions

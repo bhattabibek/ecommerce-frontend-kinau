@@ -7,32 +7,50 @@ export const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Attach access token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
-  if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
-  return config;
+export const apiMedia = axios.create({
+  baseURL: BASE_URL,
 });
 
-// Handle 401 and auto-refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        const res = await axios.post(`${BASE_URL}/auth/refresh-token`, { refreshToken });
-        localStorage.setItem("accessToken", res.data.data.accessToken);
-        originalRequest.headers.Authorization = `Bearer ${res.data.data.accessToken}`;
-        return api(originalRequest);
-      } catch {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
-      }
-    }
-    return Promise.reject(error);
+const attachToken = (config: any) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+};
+
+api.interceptors.request.use(attachToken);
+apiMedia.interceptors.request.use(attachToken);
+
+
+const refreshInterceptor = async (error: any) => {
+  const originalRequest = error.config;
+
+  if (error.response?.status === 401 && !originalRequest._retry) {
+    originalRequest._retry = true;
+
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      const res = await axios.post(`${BASE_URL}/auth/refresh-token`, {
+        refreshToken,
+      });
+
+      const newToken = res.data.data.accessToken;
+      localStorage.setItem("accessToken", newToken);
+
+      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+      return api(originalRequest);
+    } catch {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      window.location.href = "/login";
+    }
+  }
+
+  return Promise.reject(error);
+};
+
+api.interceptors.response.use((res) => res, refreshInterceptor);
+apiMedia.interceptors.response.use((res) => res, refreshInterceptor);
+
