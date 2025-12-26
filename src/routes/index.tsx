@@ -20,6 +20,8 @@ import { Suspense } from "react";
 import { Outlet, useRoutes } from "react-router-dom";
 import AdminPage from "@/pages/Adminpage";
 import AdminLayout from "@/layout/AdminLayout";
+import ProductPage from "@/pages/products/products";
+import MonthlyOrdersSalesChart from "@/components/admin/Sales";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -34,6 +36,8 @@ const AppRoutes = () => {
       ),
       children: [
         { index: true, element: <HomePage /> },
+        {path: "sales", element: <MonthlyOrdersSalesChart/>},
+        { path: "products", element: <ProductPage /> },
         { path: "about", element: <>About</> },
         { path: "collection", element: <Collection /> },
         {
@@ -46,7 +50,7 @@ const AppRoutes = () => {
           children: [
             { index: true, element: <>Auth</> },
             { path: "forgot-password", element: <ForgotPassword /> },
-            { path: "ProductDetailPage", element: <ProductDetailPage /> },
+            { path: "ProductDetailPage/:slug", element: <ProductDetailPage /> },
             { path: "checkout", element: <CheckoutPage /> },
             {
               path: "dashboard",
@@ -72,9 +76,7 @@ const AppRoutes = () => {
           path: "cart",
           element: (
             <Suspense fallback={<h1>Loading...</h1>}>
-              <AuthGuard>
                 <Cart />
-              </AuthGuard>
             </Suspense>
           ),
         },
@@ -105,6 +107,7 @@ const AppRoutes = () => {
         { path: "*", element: <>Not Found</> },
       ],
     },
+  
     {
       path:"/admin",
       element:(

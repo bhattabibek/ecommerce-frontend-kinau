@@ -1,74 +1,108 @@
 // components/admin/Variant/VariantForm.tsx
+import { addVariant } from "@/redux/features/variant.slice";
+import type { RootState } from "@/redux/root-reducer";
+import { createVariant } from "@/redux/thunk/variant.thunk";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 
-interface VariantFormProps {
-  onSubmit: (data: VariantData) => void;
-  initialData?: { product: string; color: string; size: string; stock: number };
-}
-interface VariantData {
-  product:string;
-  color:string;
-  size:string;
-  stock:number;
-}
+export default function VariantForm({initialData}: any) {
+  const dispatch = useDispatch<any>();
+  const {isLoading: productLoading, products, error: productError } = useSelector((state:RootState)=>state.product)
+  const {isLoading: sizeLoading, sizes, error: sizeError } = useSelector((state:RootState)=>state.size)
+  const {isLoading:colorLoading, colors, error: colorError } = useSelector((state:RootState)=>state.color)
 
-export default function VariantForm({ onSubmit, initialData }: VariantFormProps) {
-  const [product, setProduct] = useState(initialData?.product || "");
-  const [color, setColor] = useState(initialData?.color || "");
-  const [size, setSize] = useState(initialData?.size || "");
-  const [stock, setStock] = useState(initialData?.stock || 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [product, setProduct] = useState("");
+  const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
+  const [sku, setSku] = useState("");
+  const [price, setPrice] = useState<number>(0);
+  const [discountPrice, setDiscountPrice] = useState<number | "">("");
+  const [stock, setStock] = useState<number>(0);
+  const [image, setImage] = useState<File | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ product, color, size, stock });
+
+    const formData = new FormData();
+    formData.append("product", product);
+    formData.append("color", color);
+    formData.append("size", size);
+    formData.append("sku", sku);
+    formData.append("price", String(price));
+    formData.append("stock", String(stock));
+
+    if (discountPrice !== "")
+      formData.append("discountPrice", String(discountPrice));
+
+    if (image) formData.append("image", image);
+
+    const result = await dispatch(createVariant(formData));
+
+    if (createVariant.fulfilled.match(result)) {
+       dispatch(addVariant(result.payload))
+      toast.success("Variant created successfully");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-2xl shadow mb-6 space-y-4">
-      <h2 className="text-xl font-semibold">Add / Edit Variant</h2>
+    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-2xl shadow space-y-4">
+      <h2 className="text-xl font-semibold">Add Variant</h2>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Product</label>
-        <input
-          type="text"
-          value={product}
-          onChange={(e) => setProduct(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-      </div>
+<select
+  className="w-full border p-2 rounded"
+  value={product}
+  onChange={(e) => setProduct(e.target.value)}
+  required
+>
+  <option value="">Select Product</option>
+  {products.map((p: any) => (
+    <option key={p._id} value={p._id}>
+      {p.name}
+    </option>
+  ))}
+</select>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Color</label>
-        <input
-          type="text"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-      </div>
+<select
+  className="w-full border p-2 rounded"
+  value={color}
+  onChange={(e) => setColor(e.target.value)}
+  required
+>
+  <option value="">Select Color</option>
+  {colors.map((c: any) => (
+    <option key={c._id} value={c._id}>
+      {c.name}
+    </option>
+  ))}
+</select>
+<select
+  className="w-full border p-2 rounded"
+  value={size}
+  onChange={(e) => setSize(e.target.value)}
+  required
+>
+  <option value="">Select Size</option>
+  {sizes.map((s: any) => (
+    <option key={s._id} value={s._id}>
+      {s.name}
+    </option>
+  ))}
+</select>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Size</label>
-        <input
-          type="text"
-          value={size}
-          onChange={(e) => setSize(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Stock</label>
-        <input
-          type="number"
-          value={stock}
-          onChange={(e) => setStock(Number(e.target.value))}
-          className="w-full border p-2 rounded"
-        />
-      </div>
+      <input className="input" placeholder="SKU" onChange={(e) => setSku(e.target.value)} required />
 
-      <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-        Save
+      <input type="number" className="input" placeholder="Price" onChange={(e) => setPrice(Number(e.target.value))} required />
+      <input type="number" className="input" placeholder="Discount Price" onChange={(e) => setDiscountPrice(Number(e.target.value))} />
+
+      <input type="number" className="input" placeholder="Stock" onChange={(e) => setStock(Number(e.target.value))} required />
+
+      <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)} />
+
+      <button className="bg-green-500 text-white px-4 py-2 rounded">
+        Save Variant
       </button>
     </form>
   );

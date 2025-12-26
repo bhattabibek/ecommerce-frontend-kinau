@@ -1,68 +1,78 @@
-import { useState } from "react";
-const Cart = () => {
-  const [showAddress, setShowAddress] = useState(false);
+import type { RootState } from "@/redux/root-reducer";
+import type { AppDispatch } from "@/redux/store";
+import { addToCartThunk } from "@/redux/thunk/cart.thunk";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import AddressForm from "./ShippingForm";
+import { createShippingAddress, getDefaultShippingAddress } from "@/redux/thunk/shipping.thunk";
+import { createOrder } from "@/redux/thunk/oreder.thunk";
+import { clearCart, removeFromCart } from "@/redux/features/cart.slice";
+import toast from "react-hot-toast";
 
-  const products = [
-    {
-      name: "Running Shoes",
-      description: [
-        "Lightweight and comfortable",
-        "Breathable mesh upper",
-        "Ideal for jogging and casual wear",
-      ],
-      offerPrice: 250,
-      price: 200,
-      quantity: 1,
-      size: 42,
-      image:
-        "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/card/productImage.png",
-      category: "Footwear",
-    },
-    {
-      name: "Running Shoes",
-      description: [
-        "Lightweight and comfortable",
-        "Breathable mesh upper",
-        "Ideal for jogging and casual wear",
-      ],
-      offerPrice: 250,
-      price: 200,
-      quantity: 1,
-      size: 42,
-      image:
-        "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/card/productImage2.png",
-      category: "Footwear",
-    },
-    {
-      name: "Running Shoes",
-      description: [
-        "Lightweight and comfortable",
-        "Breathable mesh upper",
-        "Ideal for jogging and casual wear",
-      ],
-      offerPrice: 250,
-      price: 200,
-      quantity: 1,
-      size: 42,
-      image:
-        "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/card/productImage3.png",
-      category: "Footwear",
-    },
-  ];
+const Cart = () => {
+  const dispatch = useDispatch<AppDispatch>()
+  const [showAddress, setShowAddress] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState<any>(null)
+  const [paymentMethod, setPaymentMethod] = useState<"COD" | "Online">("COD");
+
+  useEffect(()=>{
+    (async()=>{
+      const result = await dispatch(getDefaultShippingAddress())
+      if(getDefaultShippingAddress.fulfilled.match(result)){
+        setShippingAddress(result.payload)
+      }
+      
+    })()
+  },[dispatch])
+  // Use Redux cart state
+  const carts = useSelector((state: RootState) => state.carts.carts);
+
+  // Calculate totals
+  const totalPrice = carts?.reduce(
+    (sum: number, item: any) => sum + item.price * item.quantity,
+    0
+  );
+
+  const handelPlaceOrder = async()=>{
+    const orderItems = carts.map((item) => ({
+      product: item.product,  
+      quantity: item.quantity,
+      price: item.price,
+      variant: item.variant._id
+    }));
+    const result = await dispatch(addToCartThunk({items: orderItems, totalAmount: totalPrice}))
+    if(addToCartThunk.fulfilled.match(result)){
+      await dispatch(createOrder({shippingAddressId: shippingAddress._id, paymentMethod}))
+      await dispatch(clearCart())
+    }
+  }
+
+  const handleAddAddress = async(data: any) => {
+    console.log("Address submitted:", data);
+    const result = await dispatch(createShippingAddress(data))
+    if(createShippingAddress.fulfilled.match(result)){
+      toast.success("address added")
+    }
+    setShowModal(false);
+  };
+
   return (
     <div className="flex flex-col md:flex-row py-16 max-w-6xl w-full px-6 mx-auto">
+      {/* Left - Cart Items */}
       <div className="flex-1 max-w-4xl">
         <h1 className="text-3xl font-medium mb-6">
-          Shopping Cart <span className="text-sm text-indigo-500">3 Items</span>
+          Shopping Cart <span className="text-sm text-indigo-500">{carts?.length} Items</span>
         </h1>
 
+        {/* Header */}
         <div className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 text-base font-medium pb-3">
           <p className="text-left">Product Details</p>
           <p className="text-center">Subtotal</p>
           <p className="text-center">Action</p>
         </div>
 
-        {products.map((product, index) => (
+        {carts?.map((product, index) => (
           <div
             key={index}
             className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3"
@@ -71,7 +81,7 @@ const Cart = () => {
               <div className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded overflow-hidden">
                 <img
                   className="max-w-full h-full object-cover"
-                  src={product.image}
+                  src={product?.image || "/assets/product.jpg"}
                   alt={product.name}
                 />
               </div>
@@ -79,16 +89,23 @@ const Cart = () => {
                 <p className="hidden md:block font-semibold">{product.name}</p>
                 <div className="font-normal text-gray-500/70">
                   <p>
-                    Size: <span>{product.size || "N/A"}</span>
+                    Size: <span>{product?.variant?.size.name}</span>
                   </p>
-                  <div className="flex items-center">
+                  <p>
+                    Color: <span>{product?.variant?.color?.name || "-"}</span>
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
                     <p>Qty:</p>
-                    <select className="outline-none">
-                      {Array(5)
-                        .fill("")
-                        .map((_, index) => (
-                          <option key={index} value={index + 1}>
-                            {index + 1}
+                    <select
+                      className="outline-none border border-gray-300 rounded px-1"
+                      value={product.quantity}
+                      // You can add an onChange handler to update quantity in Redux
+                    >
+                      {Array(10)
+                        .fill(0)
+                        .map((_, idx) => (
+                          <option key={idx} value={idx + 1}>
+                            {idx + 1}
                           </option>
                         ))}
                     </select>
@@ -96,9 +113,11 @@ const Cart = () => {
                 </div>
               </div>
             </div>
+
             <p className="text-center">
-              ${product.offerPrice * product.quantity}
+              ${product.price * product.quantity}
             </p>
+
             <button className="cursor-pointer mx-auto">
               <svg
                 width="20"
@@ -139,14 +158,20 @@ const Cart = () => {
         </button>
       </div>
 
+      {/* Right - Order Summary */}
       <div className="max-w-[360px] w-full bg-gray-100/40 p-5 max-md:mt-16 border border-gray-300/70">
         <h2 className="text-xl md:text-xl font-medium">Order Summary</h2>
         <hr className="border-gray-300 my-5" />
 
+        {/* Delivery & Payment */}
         <div className="mb-6">
           <p className="text-sm font-medium uppercase">Delivery Address</p>
           <div className="relative flex justify-between items-start mt-2">
+            {
+              shippingAddress ? `${shippingAddress.addressLine1}, ${shippingAddress.city}` :
             <p className="text-gray-500">No address found</p>
+
+            }
             <button
               onClick={() => setShowAddress(!showAddress)}
               className="text-indigo-500 hover:underline cursor-pointer"
@@ -154,26 +179,44 @@ const Cart = () => {
               Change
             </button>
             {showAddress && (
-              <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
+              <>
+              <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full z-10">
                 <p
                   onClick={() => setShowAddress(false)}
-                  className="text-gray-500 p-2 hover:bg-gray-100"
+                  className="text-gray-500 p-2 hover:bg-gray-100 cursor-pointer"
                 >
                   New York, USA
                 </p>
                 <p
-                  onClick={() => setShowAddress(false)}
+                  onClick={() => setShowModal(true)}
                   className="text-indigo-500 text-center cursor-pointer p-2 hover:bg-indigo-500/10"
                 >
                   Add address
                 </p>
               </div>
+              {showModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <AddressForm onSubmit={handleAddAddress} />
+          </div>
+        </div>
+      )}
+              </>
             )}
           </div>
 
           <p className="text-sm font-medium uppercase mt-6">Payment Method</p>
-
-          <select className="w-full border border-gray-300 bg-white px-3 py-2 mt-2 outline-none">
+          <select
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value as "COD" | "Online")}
+            className="w-full border border-gray-300 bg-white px-3 py-2 mt-2 outline-none"
+          >
             <option value="COD">Cash On Delivery</option>
             <option value="Online">Online Payment</option>
           </select>
@@ -181,10 +224,11 @@ const Cart = () => {
 
         <hr className="border-gray-300" />
 
+        {/* Price Summary */}
         <div className="text-gray-500 mt-4 space-y-2">
           <p className="flex justify-between">
             <span>Price</span>
-            <span>$20</span>
+            <span>${totalPrice}</span>
           </p>
           <p className="flex justify-between">
             <span>Shipping Fee</span>
@@ -192,19 +236,20 @@ const Cart = () => {
           </p>
           <p className="flex justify-between">
             <span>Tax (2%)</span>
-            <span>$20</span>
+            <span>${(totalPrice * 0.02).toFixed(2)}</span>
           </p>
           <p className="flex justify-between text-lg font-medium mt-3">
             <span>Total Amount:</span>
-            <span>$20</span>
+            <span>${(totalPrice + totalPrice * 0.02).toFixed(2)}</span>
           </p>
         </div>
 
-        <button className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition">
+        <button onClick={handelPlaceOrder} className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition">
           Place Order
         </button>
       </div>
     </div>
   );
 };
+
 export default Cart;

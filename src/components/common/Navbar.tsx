@@ -1,12 +1,15 @@
 import useDebounce from "@/hooks/useDebounce";
 import { Search, ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaRegUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { IoBagHandleOutline } from "react-icons/io5";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/features/thunks";
 import { useHasToken } from "@/hooks/useCheckStates";
+import type { RootState } from "@/redux/root-reducer";
+import { getWishlistCount } from "@/redux/thunk/wishlist.thunk";
+import { changeWishlistCount } from "@/redux/features/wishlist.slice";
 
 const Navbar = () => {
   const [search, setSearch] = useState("");
@@ -14,9 +17,20 @@ const Navbar = () => {
   const navigate = useNavigate();
   const debouncedValue = useDebounce(search, 1000);
   console.log(search, debouncedValue);
-  const productCount = 3;
+  const carts = useSelector((state: RootState) => state.carts.carts);
+  const productCount = carts?.length ?? 0;
+  const wishListCount = useSelector((state:RootState)=>state.wishlist.count)
 
   const isLoggedIn = useHasToken()
+  useEffect(()=>{
+  (async()=>{
+    const result = await dispatch(getWishlistCount())
+    if(getWishlistCount.fulfilled.match(result)){
+      dispatch(changeWishlistCount(result.payload.count))
+    }
+  })()
+
+  },[])
   const logOut = () => {
     dispatch(logoutUser()).then(() => {
       navigate("/login", { replace: true });
@@ -68,7 +82,7 @@ const Navbar = () => {
 
             {
               isLoggedIn &&
-<div
+            <div
               className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md 
                  opacity-0 invisible group-hover:opacity-100 group-hover:visible
                  transition-all duration-200 z-50"
@@ -107,7 +121,20 @@ const Navbar = () => {
           </Link>
 
           {/* BAG ICON */}
-          <IoBagHandleOutline />
+          <Link to="/wishlist">
+            <div className="relative">
+              <IoBagHandleOutline className="cursor-pointer hover:text-gray-300 w-6 h-6" />
+
+              {wishListCount > 0 && (
+                <span
+                  className="absolute -top-2 -right-2 bg-red-500 text-white text-xs 
+                         font-bold px-1.5 py-0.5 rounded-full"
+                >
+                  {wishListCount}
+                </span>
+              )}
+            </div>
+          </Link>
         </div>
       </div>
     </div>
