@@ -4,6 +4,7 @@ import type { AppDispatch } from "@/redux/store";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteVariant, getAllVariantByProduct } from "@/redux/thunk/variant.thunk";
+import { getAllProducts } from "@/redux/thunk/product.thunk";
 
 interface Props {
   handleEditVariant: (variant: any) => void;
@@ -12,6 +13,10 @@ interface Props {
 export default function VariantList({ handleEditVariant }: Props) {
   const dispatch = useDispatch<AppDispatch>();
 
+useEffect(()=>{
+  dispatch(getAllProducts({
+        }))
+},[dispatch])
   const { products, isLoading: productLoading } = useSelector(
     (state: RootState) => state.product
   );

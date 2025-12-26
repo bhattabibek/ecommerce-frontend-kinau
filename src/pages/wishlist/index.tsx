@@ -1,55 +1,104 @@
-import { removeWishlistFromStore } from "@/redux/features/wishlist.slice";
-import { dispatch, useSelector } from "@/redux/store";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Trash2, Heart } from "lucide-react";
+
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/redux/root-reducer";
+import type { AppDispatch } from "@/redux/store";
+import { getWishList, removeFromWishlist } from "@/redux/thunk/wishlist.thunk";
+import toast from "react-hot-toast";
 
 const Wishlist = () => {
-  const { wishlists } = useSelector((state) => state.wishlist);
+  const dispatch = useDispatch<AppDispatch>();
+  const { wishlists, isLoading } = useSelector((state:RootState) => state.wishlist);
+  useEffect(() => {
+    dispatch(getWishList());
+  }, [dispatch]);
 
-  const handleRemoveItem = (id: string | number) => {
-    dispatch(removeWishlistFromStore(id));
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <p className="text-gray-500">Loading wishlist...</p>
+      </div>
+    );
+  }
+
+  if (!wishlists.length) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Heart className="w-12 h-12 text-gray-300 mb-4" />
+        <h2 className="text-xl font-semibold">Your wishlist is empty</h2>
+        <p className="text-gray-500 mt-2">
+          Save items you love for later
+        </p>
+        <Link
+          to="/shop"
+          className="mt-4 text-indigo-600 hover:underline"
+        >
+          Continue Shopping
+        </Link>
+      </div>
+    );
+  }
+
+  const handleRemoveFromWishlist = async(productId: string)=>{
+    const result = await dispatch(removeFromWishlist(productId))
+    if(removeFromWishlist.fulfilled.match(result)){
+     toast.success("removed from wishlist")
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-white text-black p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-10 border-b pb-4 border-black uppercase">
-          Wishlists
-        </h1>
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <h1 className="text-2xl font-bold mb-6">My Wishlist</h1>
 
-        {wishlists.length === 0 ? (
-          <div className="text-center text-gray-600 mt-20">
-            <p className="text-xl mb-4">Your wishlist is empty.</p>
-            <button className="px-6 py-2 border border-black hover:bg-black hover:text-white transition">
-              Start Shopping
-            </button>
-          </div>
-        ) : (
-          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {wishlists.map((item) => (
-              <div
-                key={item.id}
-                className="border border-black rounded-xl shadow-md hover:shadow-xl transition duration-300 group"
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {wishlists.map((item) => (
+          <div
+            key={item._id}
+            className="border rounded-lg p-4 hover:shadow-md transition"
+          >
+            <Link to={`/product/${item.product._id}`}>
+              <img
+                src={item.product.mainImages[0]}
+                alt={item.product.name}
+                className="w-full h-48 object-cover rounded"
+              />
+            </Link>
+
+            <div className="mt-4">
+              <Link
+                to={`/product/${item.product._id}`}
+                className="font-semibold hover:underline"
               >
-                <img
-                  src={item.product.image}
-                  alt={item.product.name}
-                  className="w-full h-60 object-cover rounded-t-xl grayscale group-hover:grayscale-0 transition"
-                />
-                <div className="p-4">
-                  <h2 className="text-xl font-semibold mb-1">
-                    {item.product.name}
-                  </h2>
-                  <p className="text-gray-700 mb-3">{item.product.price}</p>
-                  <button
-                    onClick={() => handleRemoveItem(item.id)}
-                    className="px-4 py-2 text-sm border border-black hover:bg-black hover:text-white transition"
-                  >
-                    Remove
-                  </button>
-                </div>
+                {item.product.name}
+              </Link>
+
+              <p className="text-gray-600 mt-1">
+                ${item.product.priceRange.min}
+              </p>
+
+              <div className="flex justify-between items-center mt-4">
+                <Link
+                  to={`/auth/productDetailPage/${item.product.slug}`}
+                  className="text-sm text-indigo-600 hover:underline"
+                >
+                  View Product
+                </Link>
+
+                <button
+                  onClick={() =>
+                    handleRemoveFromWishlist(item.product._id)
+                  }
+                  className="text-red-500 hover:text-red-600"
+                  title="Remove"
+                >
+                  <Trash2 size={18} />
+                </button>
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

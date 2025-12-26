@@ -8,6 +8,7 @@ import orderSlice from "./features/order.slice"
 import sizeSlice from "./features/size.slice"
 import colorSlice from "./features/color.slice"
 import variantSlice from "./features/variant.slice"
+import cartSlice from "./features/cart.slice"
 
 
 const rootReducer = combineReducers({
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
     wishlist:wishlistSlice,
     auth:authSlice,
     order:orderSlice,
+    carts: cartSlice
 
 })
 

@@ -5,6 +5,7 @@ import { createSize, updateSize } from "@/redux/thunk/size.thunk";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateSize as updateSizeReducer } from "@/redux/features/size.slice";
+import toast from "react-hot-toast";
 
 interface SizeFormProps {
   initialData?: { _id:string,name:string, code:string, description:string} | null;
@@ -36,14 +37,14 @@ export default function SizeForm({  initialData }: SizeFormProps) {
 
       if (updateSize.fulfilled.match(result)) {
         dispatch(updateSizeReducer(result.payload));
-        alert("Size updated");
+        toast.success("Size updated");
       }
     }else {
     try {
       const resultAction = await dispatch(createSize({name, code, description}))
       if(createSize.fulfilled.match(resultAction)) {
         dispatch(addSize(resultAction.payload))
-        alert("size created")
+        toast.success("size created")
       }else {
         console.log("Failed to create size")
       }

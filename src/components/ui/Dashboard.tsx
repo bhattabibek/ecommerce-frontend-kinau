@@ -15,6 +15,7 @@ import SizeForm from "@/components/admin/Size/SizeForm";
 
 import ColorList from "@/components/admin/Color/ColorList";
 import ColorForm from "@/components/admin/Color/ColorForm";
+import MonthlyOrdersSalesChart from "../admin/Sales";
 
 interface SidebarItemProps {
   label: string;
@@ -160,6 +161,8 @@ const [editingColor, setEditingColor] = useState<EditingColor | null>(null);
       {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto space-y-6">
         <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+
+        <MonthlyOrdersSalesChart/>
 
         {/* Products */}
         <div>

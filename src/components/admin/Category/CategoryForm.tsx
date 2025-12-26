@@ -2,6 +2,7 @@
 import { addCategories } from "@/redux/features/category.slice";
 import { createCategory } from "@/redux/thunk/category.thunk";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
 interface CategoryFormProps {
@@ -22,7 +23,7 @@ export default function CategoryForm({ initialData }: CategoryFormProps) {
       const resultAction = await dispatch(createCategory({name}))
       if(createCategory.fulfilled.match(resultAction)) {
         dispatch(addCategories(resultAction.payload))
-        alert("category created")
+        toast.success("category created")
       }else {
         console.error("Failed to create category:", resultAction)
       }

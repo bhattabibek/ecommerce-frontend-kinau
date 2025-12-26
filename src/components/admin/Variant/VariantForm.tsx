@@ -3,6 +3,7 @@ import { addVariant } from "@/redux/features/variant.slice";
 import type { RootState } from "@/redux/root-reducer";
 import { createVariant } from "@/redux/thunk/variant.thunk";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function VariantForm({initialData}: any) {
@@ -41,7 +42,7 @@ export default function VariantForm({initialData}: any) {
 
     if (createVariant.fulfilled.match(result)) {
        dispatch(addVariant(result.payload))
-      alert("Variant created successfully");
+      toast.success("Variant created successfully");
     }
   };
 

@@ -2,6 +2,7 @@ import { addProducts, updateProductReducer } from "@/redux/features/product.slic
 import type { RootState } from "@/redux/root-reducer";
 import { createProduct, updateProduct } from "@/redux/thunk/product.thunk";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 interface ProductFormProps {
@@ -101,7 +102,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         const result = await dispatch(updateProduct(formData))
         if (updateProduct.fulfilled.match(result)) {
           dispatch(updateProductReducer(result.payload));
-          alert("product updated");
+          toast.success("product updated");
         }
       } catch (error) {
         console.log(error, " error")
@@ -112,7 +113,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
         if (createProduct.fulfilled.match(result)) {
           dispatch(addProducts(result.payload))
-          alert("Product created successfully");
+          toast.success("Product created successfully");
         } else {
           console.error(result);
         }

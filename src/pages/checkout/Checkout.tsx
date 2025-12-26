@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
   const cartItems = [
@@ -31,7 +32,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("Order placed!");
+    toast.success("Order placed!");
     // Here you would send the order to backend
   };
 

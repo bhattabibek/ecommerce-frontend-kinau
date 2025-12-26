@@ -3,6 +3,7 @@ import { addColor, updateColorReducer } from "@/redux/features/color.slice";
 import type { AppDispatch } from "@/redux/store";
 import { createColor, updateColor } from "@/redux/thunk/color.thunk";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 
 interface ColorData {
@@ -35,13 +36,13 @@ export default function ColorForm({ initialData }: ColorFormProps) {
       )
       if (updateColor.fulfilled.match(result)) {
         dispatch(updateColorReducer(result.payload));
-        alert("Color updated");
+        toast.success("Color updated");
       }
     }else {
       try {
         const resultAction = await dispatch(createColor({name, hexCode}))
         dispatch(addColor(resultAction.payload))
-        alert("color created")
+        toast.success("color created")
       } catch (error: any) {
         console.log("Failed:", error)
       }
