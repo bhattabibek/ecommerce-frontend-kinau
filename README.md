@@ -1,69 +1,45 @@
-# React + TypeScript + Vite
+# Kinau E-Commerce Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive, and elegant **React** frontend for the Kinau e-commerce platform. Built for seamless shopping experiences with powerful state management and polished UI.  
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ⚡ Features
 
-## Expanding the ESLint configuration
+- **User Authentication** – Login, Registration, JWT-based sessions.  
+- **Product Browsing** – Detailed product pages with variants (color & size) and image galleries.  
+- **Cart & Checkout** – Add/remove items, adjust quantities, and complete orders.  
+- **Analytics & Charts** – Track stats with interactive chart components.  
+- **Notifications** – Real-time feedback using **React Hot Toast**.  
+- **Elegant UI** – Tailwind CSS + **Shadcn UI components** for professional design.  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠 Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **React** – Frontend framework  
+- **Redux Toolkit** – State management & API handling  
+- **Axios + createAsyncThunk** – Async API calls  
+- **Tailwind CSS** – Styling & layout  
+- **Shadcn UI** – Components for polished UI  
+- **React Hot Toast** – Notifications  
+- **Chart Components** – Analytics  
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Installation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+```bash
+git clone https://github.com/Deepakstha/ecommerce-frontend-kinau.git
+cd ecommerce-frontend-kinau
+npm install
+npm start
+📂 Folder Structure
+bash
+Copy code
+src/
+├─ components/        # Reusable UI components
+├─ pages/             # ProductDetail, Checkout, Home, etc.
+├─ redux/             # Store, slices, thunks
+├─ assets/            # Images, icons, static files
+└─ App.tsx            # App entry point
