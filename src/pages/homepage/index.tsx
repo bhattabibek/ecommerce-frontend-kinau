@@ -32,10 +32,7 @@ const HomePage = () => {
         }
 
       </div>
-      <ParallaxSection />
-      <div className="grid p-6 m-10 sm:grid-cols-2 md:grid-cols-4 2xl:grid-cols-5 gap-5">
-       
-      </div>
+     
 
       <div className="grid p-6 m-10 sm:grid-cols-2 md:grid-cols-4 2xl:grid-cols-5 gap-5">
         {

@@ -1,60 +1,47 @@
 import React, { useEffect, useState, useRef } from "react";
 
-// Slide data with reliable placeholder image URLs
+// Slide data
 const slides = [
   {
     image: "/assets/shopping.jpg",
-    title: <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-300 via-violet-200 to-indigo-600 bg-clip-text text-transparent">
-  Welcome to KINAU SHOP
-</h1>,
-subtitle: "Where Quality Matters...",
- 
+    title: (
+      <h1 className="text-5xl md:text-6xl font-semibold tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+        Welcome to KINAU SHOP
+      </h1>
+    ),
+    subtitle: "Where quality, design and performance meet.",
   },
   {
-    image: "/assets/shopper.jpg",
-    title: <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-200 via-violet-500 to-indigo-500 bg-clip-text text-transparent">
-  Premium Quality Products
-</h1>,
-    subtitle: "Discover the best deals and exclusive offers",
-
+    image: "/assets/background.jpg",
+    title: (
+      <h1 className="text-5xl md:text-6xl font-semibold tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+        Premium Quality Products
+      </h1>
+    ),
+    subtitle: "Crafted collections curated for modern lifestyles.",
   },
   {
     image: "/assets/imageone.jpg",
-    title: <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-200 via-violet-300 to-indigo-400 bg-clip-text text-transparent">
-  Fast and Reliable Delivery
-</h1>,
-    subtitle: "Right to your doorstep, lightning fast!",
-
+    title: (
+      <h1 className="text-5xl md:text-6xl font-semibold tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+        Fast & Reliable Delivery
+      </h1>
+    ),
+    subtitle: "Seamless shopping delivered right to your doorstep.",
   },
 ];
 
-// Typewriter effect component
-function Typewriter({ text, speed = 100 }) {
-  const [displayed, setDisplayed] = useState("");
-
-  
-
-  return (
-    <span>
-      {displayed}
-      <span className="inline-block w-[2px] h-[1em] bg-white animate-pulse ml-1" />
-    </span>
-  );
-}
-
-// Main Slider Component
+// Main Slider
 export default function SimpleSlider() {
   const [current, setCurrent] = useState(0);
-  const slideInterval = useRef(null);
+  const slideInterval = useRef<any>(null);
 
-  // Function to navigate to a specific slide
-  const goToSlide = (index) => {
+  const goToSlide = (index: number) => {
     if (index < 0) index = slides.length - 1;
-    else if (index >= slides.length) index = 0;
+    if (index >= slides.length) index = 0;
     setCurrent(index);
   };
 
-  // Auto-play slides every 5 seconds
   useEffect(() => {
     slideInterval.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
@@ -64,73 +51,82 @@ export default function SimpleSlider() {
   }, []);
 
   return (
-    <div className="relative w-full h-[650px] overflow-hidden">
-      {/* Slides */}
+    <section className="relative w-full h-[90vh] overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={index}
-          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${
+          className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${
             index === current ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
         >
-          {/* Image */}
+          {/* Background Image */}
           <img
             src={slide.image}
             alt={`Slide ${index + 1}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover scale-105"
             onError={(e) => {
-              e.currentTarget.src = `https://via.placeholder.com/1200x800?text=Slide+${index + 1}`;
+              e.currentTarget.src =
+                "https://via.placeholder.com/1600x900?text=Slide";
             }}
           />
 
-          {/* Overlay Content */}
-          <div className="absolute inset-0 bg-opacity-40 flex items-center justify-center px-4 md:px-10">
-            <div className="text-white max-w-xl  bg-opacity-50 p-6 rounded-lg backdrop-blur-sm border border-white border-opacity-20">
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                {slide.hasTypewriter ? (
-                  <Typewriter text={slide.title} speed={100} />
-                ) : (
-                  slide.title
-                )}
-              </h1>
-              <p className="text-lg md:text-xl opacity-90">{slide.subtitle}</p>
-              <button className="mt-6 bg-white text-black font-semibold py-2 px-6 rounded-full hover:bg-opacity-90 transition-all transform hover:scale-105">
-                Shop Now
-              </button>
+          {/* Cinematic Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
+
+          {/* Content */}
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="max-w-2xl space-y-6">
+                {slide.title}
+                <p className="text-lg md:text-xl text-gray-200 leading-relaxed">
+                  {slide.subtitle}
+                </p>
+
+                <button className="mt-6 inline-flex items-center gap-2 rounded-full
+                                   bg-white px-8 py-3 text-sm font-medium text-black
+                                   hover:bg-gray-200 transition">
+                  Shop Collection
+                  <span className="text-lg">→</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       ))}
 
-      {/* Prev/Next Buttons */}
+      {/* Navigation Arrows */}
       <button
         onClick={() => goToSlide(current - 1)}
-        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white bg-opacity-50 text-black p-3  hover:bg-opacity-80 transition-all z-20"
-        aria-label="Previous slide"
+        className="absolute left-6 top-1/2 -translate-y-1/2 z-20
+                   rounded-full bg-white/10 backdrop-blur-md
+                   p-4 text-white hover:bg-white/20 transition"
       >
-        &#8592;
-      </button>
-      <button
-        onClick={() => goToSlide(current + 1)}
-        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white bg-opacity-50 text-black p-3 hover:bg-opacity-80 transition-all z-20"
-        aria-label="Next slide"
-      >
-        &#8594;
+        ←
       </button>
 
-      {/* Navigation Dots */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+      <button
+        onClick={() => goToSlide(current + 1)}
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-20
+                   rounded-full bg-white/10 backdrop-blur-md
+                   p-4 text-white hover:bg-white/20 transition"
+      >
+        →
+      </button>
+
+      {/* Dots */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-20">
         {slides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => goToSlide(idx)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              idx === current ? "bg-white scale-125" : "bg-gray-400"
+            className={`h-2.5 w-2.5 rounded-full transition-all ${
+              idx === current
+                ? "bg-white scale-125"
+                : "bg-white/40 hover:bg-white/70"
             }`}
-            aria-label={`Go to slide ${idx + 1}`}
-          ></button>
+          />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

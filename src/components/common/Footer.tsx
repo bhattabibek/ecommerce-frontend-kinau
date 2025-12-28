@@ -2,79 +2,97 @@ import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <>
-      <div className="flex gap-8 bg-black text-white flex-wrap p-8"></div>
-      <div className="flex gap-10  flex-wrap justify-center bg-black text-white">
-        <div>
-               <div ><img width={70} height={70} src="/assets/kinaulogo.png"/></div>
-          <p>
-            Welcome to Ecom, a place for all <br />
-            your shopping Needs. @one place. <br />
-            Explore our Store for the best products.
-          </p>
-        </div>
-        <div>
-          <h1 className="text-lg bold mb-4 ">PRODUCTS</h1>
-          <p className="mb-4">FootWear</p>
-          <p className="mb-4">Clothing</p>
-          <p className="mb-4">Accessories</p>
-          <p className="mb-4">Flat 20% off</p>
-          <p className="mb-4">New Arrivals</p>
-          <p className="mb-4">Trending</p>
-        </div>
-        <div>
-          <h1 className="text-lg bold mb-4">SPORTS</h1>
-          <p className="mb-4">Cricket</p>
-          <p className="mb-4">Marathon</p>
-          <p className="mb-4">Soccer</p>
-          <p className="mb-4">Rugby</p>
-          <p className="mb-4">Football</p>
-          <p className="mb-4">Golf</p>
-          <p className="mb-4">Polo</p>
-        </div>
-        <div>
-          <h1 className="text-lg bold mb-4">COLLECTIONS</h1>
-          <p className="mb-4">Ultraboost</p>
-          <p className="mb-4">Super Nova</p>
-          <p className="mb-4">Rust</p>
-          <p className="mb-4">Hawk</p>
-          <p className="mb-4">Falcon</p>
-          <p className="mb-4">Reebok</p>
-        </div>
-        <div>
-          <h1 className="text-lg bold mb-4">SUPPORT</h1>
-          <p className="mb-4">About</p>
-          <p className="mb-4">Contact</p>
-          <p className="mb-4">mail</p>
-          <p className="mb-4">Order Tracking</p>
-          <p className="mb-4">club</p>
-          <p className="mb-4">Trending</p>
-        </div>
-         <div>
-          <h1 className="text-lg bold mb-4">Reach us at</h1>
-          <p className="mb-4">Call: +567 987 5678</p>
-          <p className="mb-4">Visit Us at: New Road, Kathmandu</p>
-          <p className="mb-4">Mail us at: kinaushop@email.com</p>
-         
-        </div>
-        <div>
-          <h1 className="text-lg bold mb-4">FOLLOW US</h1>
-          <div className="flex gap-4">
-            {" "}
-            <p className="mb-4">
-              <FaFacebook className="text-2xl hover:text-blue-400 cursor-pointer" />
-            </p>
-            <p className="mb-4">
-              <FaInstagram className="text-2xl hover:text-red-600 cursor-pointer" />
-            </p>
-            <p className="mb-4">
-              <FaLinkedin className="text-2xl hover:text-blue-500 cursor-pointer"  />
+    <footer className="relative overflow-hidden bg-gradient-to-b from-[#0b0b0b] via-black to-black text-gray-400">
+      
+      {/* Ambient gradient glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-32 left-1/4 h-[420px] w-[420px] rounded-full bg-indigo-600/10 blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 h-[420px] w-[420px] rounded-full bg-purple-600/10 blur-[120px]" />
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-24">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-6">
+
+          {/* Brand */}
+          <div className="lg:col-span-2 space-y-6">
+            <img
+              src="/assets/kinaulogo.png"
+              alt="Kinau"
+              className="h-16 w-16 object-contain drop-shadow-xl"
+            />
+            <p className="max-w-sm text-sm leading-relaxed text-gray-300">
+              Kinau is a premium shopping destination for performance wear,
+              footwear, and accessories — crafted for everyday athletes and
+              modern lifestyles.
             </p>
           </div>
+
+          {/* Reusable section */}
+          {[
+            { title: "PRODUCTS", items: ["Footwear", "Clothing", "Accessories", "New Arrivals", "Trending"] },
+            { title: "SPORTS", items: ["Cricket", "Football", "Marathon", "Rugby", "Golf"] },
+            { title: "COLLECTIONS", items: ["Ultraboost", "Super Nova", "Falcon", "Reebok"] },
+          ].map((section) => (
+            <div key={section.title}>
+              <h3 className="mb-6 text-xs font-semibold tracking-[0.25em] text-white">
+                {section.title}
+              </h3>
+              <ul className="space-y-4 text-sm">
+                {section.items.map((item) => (
+                  <li
+                    key={item}
+                    className="group relative cursor-pointer transition-all duration-300 hover:text-white"
+                  >
+                    <span className="absolute -left-4 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-white opacity-0 transition-all duration-300 group-hover:opacity-100" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          {/* Support & Social */}
+          <div className="space-y-12">
+            <div>
+              <h3 className="mb-6 text-xs font-semibold tracking-[0.25em] text-white">
+                SUPPORT
+              </h3>
+              <ul className="space-y-4 text-sm">
+                {["About", "Contact", "Order Tracking", "Club"].map((item) => (
+                  <li
+                    key={item}
+                    className="cursor-pointer transition-colors duration-300 hover:text-white"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="mb-5 text-xs font-semibold tracking-[0.25em] text-white">
+                CONNECT
+              </h3>
+              <div className="flex gap-6 text-lg">
+                {[FaFacebook, FaInstagram, FaLinkedin].map((Icon, i) => (
+                  <Icon
+                    key={i}
+                    className="cursor-pointer transition-all duration-300 hover:scale-110 hover:text-white"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-      <div className="p-4">Copyright © 2025. All Rights Reserved.</div>
-    </>
+
+      {/* Bottom Bar */}
+      <div className="relative z-10 border-t border-white/10 bg-black/40 backdrop-blur-sm py-6 text-center text-xs tracking-wider text-gray-500">
+        © 2025 Kinau. Crafted with precision. All rights reserved.
+      </div>
+    </footer>
   );
 };
 

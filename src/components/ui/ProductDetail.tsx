@@ -8,6 +8,8 @@ import type { AppDispatch } from "@/redux/store";
 import { addToCart } from "@/redux/features/cart.slice";
 import type { RootState } from "@/redux/root-reducer";
 import toast from "react-hot-toast";
+import { FaStar } from "react-icons/fa";
+import { IoCheckmarkCircleSharp } from "react-icons/io5";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -16,8 +18,9 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<any>(null);
   const [selectedColor, setSelectedColor] = useState<any>(null);
   const [selectedSize, setSelectedSize] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
 
-  const cart = useSelector((state:RootState)=>state.carts.carts)
+  const cart = useSelector((state: RootState) => state.carts.carts);
 
   useEffect(() => {
     (async () => {
@@ -29,7 +32,6 @@ export default function ProductDetailPage() {
     })();
   }, [dispatch, slug]);
 
-  // Extract unique colors & sizes from variants
   const colors = useMemo(() => {
     if (!product?.variants) return [];
     return Array.from(
@@ -44,19 +46,24 @@ export default function ProductDetailPage() {
     );
   }, [product]);
 
-  // Find variant matching current selection
   const selectedVariant = useMemo(() => {
     if (!selectedColor || !selectedSize) return null;
     return product?.variants.find(
-      (v: any) => v.color._id === selectedColor._id && v.size._id === selectedSize._id
+      (v: any) =>
+        v.color._id === selectedColor._id && v.size._id === selectedSize._id
     );
   }, [product, selectedColor, selectedSize]);
 
-  // Calculate dynamic price: basePrice + variant price
   const displayedPrice = useMemo(() => {
     if (!product) return 0;
-    const variantPrice = selectedVariant?.discountPrice ?? selectedVariant?.price ?? 0;
+    const variantPrice =
+      selectedVariant?.discountPrice ?? selectedVariant?.price ?? 0;
     return product.basePrice + variantPrice;
+  }, [product, selectedVariant]);
+
+  const originalPrice = useMemo(() => {
+    if (!product) return 0;
+    return product.basePrice + (selectedVariant?.price || 0);
   }, [product, selectedVariant]);
 
   const handleAddToCart = () => {
@@ -71,95 +78,209 @@ export default function ProductDetailPage() {
       quantity: 1,
       price: displayedPrice,
     };
-    dispatch(addToCart(cartItem))
-   
-    const totalAmount = cart.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);
-    toast.success(`Added to cart! `);
-  };
+    dispatch(addToCart(cartItem));
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Product Image */}
+    toast.success(
+      <div className="flex items-center gap-3">
+        <IoCheckmarkCircleSharp className="text-green-500 text-xl" />
         <div>
-          <img
-            src={selectedVariant?.image || product?.mainImages?.[0] || "/assets/product.jpg"}
-            alt={product?.name}
-            className="w-full h-auto rounded-xl shadow-md"
-          />
-        </div>
-
-        {/* Product Info */}
-        <div>
-          <h1 className="text-3xl font-bold mb-2">{product?.name}</h1>
-
-          <p className="text-2xl font-semibold text-green-600 mb-4">
-            Rs. {displayedPrice}
+          <p className="font-semibold">Added to cart successfully!</p>
+          <p className="text-sm text-gray-600">
+            Continue shopping or proceed to checkout
           </p>
-
-          <p className="text-gray-700 mb-6">{product?.description}</p>
-
-          {/* Colors */}
-          <div className="mb-4">
-            <h4 className="text-sm font-semibold mb-2">Color</h4>
-            <div className="flex gap-3">
-              {colors.map((color: any) => {
-                const available = product?.variants.some(
-                  (v: any) => v.color._id === color._id && (!selectedSize || v.size._id === selectedSize._id)
-                );
-                return (
-                  <button
-                    key={color._id}
-                    onClick={() => setSelectedColor(color)}
-                    className={`w-8 h-8 rounded-full border-2 ${
-                      selectedColor?._id === color._id ? "border-black" : "border-gray-300"
-                    } ${!available ? "opacity-40 cursor-not-allowed" : ""}`}
-                    style={{ backgroundColor: color.hexCode }}
-                    disabled={!available}
-                    title={color.name}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Sizes */}
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold mb-2">Size</h4>
-            <div className="flex gap-3">
-              {sizes.map((size: any) => {
-                const available = product?.variants.some(
-                  (v: any) => v.size._id === size._id && (!selectedColor || v.color._id === selectedColor._id)
-                );
-                return (
-                  <button
-                    key={size._id}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-1 border rounded-full text-sm ${
-                      selectedSize?._id === size._id ? "border-black bg-gray-100" : "border-gray-300"
-                    } ${!available ? "opacity-40 cursor-not-allowed" : ""}`}
-                    disabled={!available}
-                  >
-                    {size.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Add to Cart */}
-          <button
-            onClick={handleAddToCart}
-            disabled={!selectedVariant}
-            className="bg-blue-900 hover:bg-blue-700 disabled:bg-gray-400 rounded-sm text-white px-6 py-2 shadow transition duration-200 flex items-center gap-2"
-          >
-            <TiShoppingCart size={26} />
-            <span>Add to Cart</span>
-          </button>
         </div>
       </div>
+    );
+  };
 
-      <ProductReviewPage />
+  const productImages = useMemo(() => {
+    const images = product?.mainImages || [];
+    if (selectedVariant?.image) {
+      return [selectedVariant.image, ...images];
+    }
+    return images;
+  }, [product, selectedVariant]);
+
+  return (
+    <div className="font-sans min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {/* Breadcrumb */}
+        <nav className="text-sm text-gray-500 mb-6">
+          <ol className="flex items-center space-x-2">
+            <li>Home</li>
+            <li className="text-gray-300">/</li>
+            <li>Products</li>
+            <li className="text-gray-300">/</li>
+            <li className="text-gray-900 font-medium truncate max-w-xs">
+              {product?.name}
+            </li>
+          </ol>
+        </nav>
+
+        {/* Hero Layout */}
+        <div className="grid lg:grid-cols-2 gap-16">
+
+          {/* Left Column: Product Images */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden relative">
+              <img
+                src={productImages[selectedImage] || "/assets/product-placeholder.jpg"}
+                alt={product?.name}
+                className="w-full h-[550px] object-contain transition-transform duration-500 hover:scale-105"
+              />
+              {product?.discount && (
+                <span className="absolute top-6 left-6 bg-red-500 text-white px-6 py-2 rounded-full text-sm font-semibold animate-pulse shadow-lg">
+                  -{product.discount}% OFF
+                </span>
+              )}
+            </div>
+
+            <div className="flex gap-4 overflow-x-auto">
+              {productImages.map((img: string, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImage(idx)}
+                  className={`flex-shrink-0 w-24 h-24 rounded-xl border-2 transition-transform duration-300 ${
+                    selectedImage === idx ? "border-blue-600 scale-105 shadow-lg" : "border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover rounded-lg" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column: Product Info */}
+          <div className="bg-white rounded-3xl shadow-2xl p-10 flex flex-col justify-between space-y-6">
+
+            {/* Title & Rating */}
+            <div>
+              <h1 className="text-5xl font-extrabold text-gray-900">{product?.name}</h1>
+              <div className="flex items-center gap-3 mt-3">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar key={i} className="text-yellow-400" />
+                ))}
+                <span className="text-gray-700 font-medium">4.8</span>
+                <span className="text-gray-400">•</span>
+                <span className="text-gray-500">142 Reviews</span>
+              </div>
+            </div>
+
+            {/* Price */}
+            <div className="flex items-center gap-4 mt-4">
+              <span className="text-4xl font-extrabold text-gray-900">
+                Rs. {displayedPrice.toLocaleString()}
+              </span>
+              {originalPrice > displayedPrice && (
+                <>
+                  <span className="text-gray-400 line-through text-xl">
+                    Rs. {originalPrice.toLocaleString()}
+                  </span>
+                  <span className="bg-green-500 text-white px-5 py-1 rounded-full text-sm font-semibold">
+                    Save Rs. {(originalPrice - displayedPrice).toLocaleString()}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-700 leading-relaxed text-lg mt-4">{product?.description}</p>
+
+            {/* Color Selector */}
+            <div className="space-y-2 mt-6">
+              <h4 className="font-semibold text-gray-900">Select Color</h4>
+              <div className="flex gap-4 flex-wrap">
+                {colors.map((color: any) => {
+                  const available = product?.variants.some(
+                    (v: any) =>
+                      v.color._id === color._id &&
+                      (!selectedSize || v.size._id === selectedSize._id)
+                  );
+                  return (
+                    <button
+                      key={color._id}
+                      onClick={() => setSelectedColor(color)}
+                      disabled={!available}
+                      className={`w-14 h-14 rounded-full border-4 transition-all duration-300 relative ${
+                        selectedColor?._id === color._id ? "border-blue-600 scale-110 shadow-lg" : "border-gray-200 hover:border-gray-400"
+                      } ${!available ? "opacity-40 cursor-not-allowed" : ""}`}
+                      style={{ backgroundColor: color.hexCode }}
+                    >
+                      {selectedColor?._id === color._id && (
+                        <IoCheckmarkCircleSharp className="absolute -top-1 -right-1 text-blue-600 bg-white rounded-full" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Size Selector */}
+            <div className="space-y-2 mt-6">
+              <h4 className="font-semibold text-gray-900">Select Size</h4>
+              <div className="flex gap-3 flex-wrap">
+                {sizes.map((size: any) => {
+                  const available = product?.variants.some(
+                    (v: any) =>
+                      v.size._id === size._id &&
+                      (!selectedColor || v.color._id === selectedColor._id)
+                  );
+                  return (
+                    <button
+                      key={size._id}
+                      onClick={() => setSelectedSize(size)}
+                      disabled={!available}
+                      className={`py-3 px-6 rounded-xl transition-all duration-300 ${
+                        selectedSize?._id === size._id
+                          ? "bg-blue-50 border-2 border-blue-500 text-blue-700 font-bold shadow"
+                          : "bg-white border-2 border-gray-200 hover:border-gray-300"
+                      } ${!available ? "opacity-40 cursor-not-allowed bg-gray-100" : ""}`}
+                    >
+                      {size.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Add to Cart & Buy Now */}
+            <div className="mt-8 space-y-4">
+              <button
+                onClick={handleAddToCart}
+                disabled={!selectedVariant}
+                className={`w-full py-5 rounded-xl font-bold text-white transition-all duration-500 ${
+                  !selectedVariant
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-black shadow-lg"
+                }`}
+              >
+                {selectedVariant ? "ADD TO CART" : "SELECT OPTIONS"}
+              </button>
+              <button className="w-full py-4 bg-black text-white rounded-xl hover:shadow-lg font-medium">
+                BUY NOW
+              </button>
+            </div>
+
+            {/* Highlights */}
+            <div className="mt-8 border-t border-gray-200 pt-6 space-y-2">
+              <h4 className="font-bold text-gray-900 text-lg">Product Highlights</h4>
+              <ul className="space-y-1">
+                {["Premium quality materials", "Eco-friendly manufacturing", "100% satisfaction guarantee"].map((h, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-gray-700">
+                    <IoCheckmarkCircleSharp className="text-green-500" /> {h}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews */}
+        <div className="mt-20">
+          <ProductReviewPage />
+        </div>
+      </div>
     </div>
   );
 }
