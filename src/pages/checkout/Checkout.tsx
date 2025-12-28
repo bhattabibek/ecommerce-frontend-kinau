@@ -39,8 +39,10 @@ export default function CheckoutPage() {
   return (
     <div className="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-8 py-8">
       {/* Billing Form */}
-      <div className="bg-white shadow rounded-2xl p-6">
-        <h2 className="text-2xl font-bold mb-4">Billing Information</h2>
+      <div className="bg-white shadow-lg rounded-2xl p-6">
+        <h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
+          Billing Information
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             name="name"
@@ -48,7 +50,7 @@ export default function CheckoutPage() {
             placeholder="Full Name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded"
+            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-teal-400 focus:outline-none transition"
           />
           <input
             name="email"
@@ -56,7 +58,7 @@ export default function CheckoutPage() {
             placeholder="Email Address"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded"
+            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-teal-400 focus:outline-none transition"
           />
           <input
             name="address"
@@ -64,7 +66,7 @@ export default function CheckoutPage() {
             placeholder="Street Address"
             value={formData.address}
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded"
+            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-teal-400 focus:outline-none transition"
           />
           <div className="flex gap-4">
             <input
@@ -73,7 +75,7 @@ export default function CheckoutPage() {
               placeholder="City"
               value={formData.city}
               onChange={handleChange}
-              className="w-full border px-4 py-2 rounded"
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-teal-400 focus:outline-none transition"
             />
             <input
               name="zip"
@@ -81,7 +83,7 @@ export default function CheckoutPage() {
               placeholder="ZIP Code"
               value={formData.zip}
               onChange={handleChange}
-              className="w-full border px-4 py-2 rounded"
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-teal-400 focus:outline-none transition"
             />
           </div>
           <input
@@ -90,11 +92,11 @@ export default function CheckoutPage() {
             placeholder="Country"
             value={formData.country}
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded"
+            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-teal-400 focus:outline-none transition"
           />
           <button
             type="submit"
-            className="w-full bg-blue-900 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-gradient-to-r from-teal-500 to-teal-700 hover:from-teal-600 hover:to-teal-800 text-white py-3 rounded-xl font-bold transition-all duration-300 shadow-lg"
           >
             Place Order
           </button>
@@ -102,18 +104,20 @@ export default function CheckoutPage() {
       </div>
 
       {/* Order Summary */}
-      <div className="bg-white shadow rounded-2xl p-6">
-        <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
+      <div className="bg-white shadow-lg rounded-2xl p-6">
+        <h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
+          Order Summary
+        </h2>
         <div className="space-y-4">
           {cartItems.map((item) => (
-            <div key={item.id} className="flex justify-between">
+            <div key={item.id} className="flex justify-between text-gray-800">
               <div>
                 {item.name} × {item.qty}
               </div>
               <div>Rs. {item.price * item.qty}</div>
             </div>
           ))}
-          <hr />
+          <hr className="border-gray-200" />
           <div className="flex justify-between text-gray-600">
             <span>Subtotal</span>
             <span>Rs. {subtotal}</span>
@@ -122,8 +126,8 @@ export default function CheckoutPage() {
             <span>Shipping</span>
             <span>Rs. {shipping}</span>
           </div>
-          <hr />
-          <div className="flex justify-between font-bold text-lg">
+          <hr className="border-gray-200" />
+          <div className="flex justify-between font-bold text-lg text-gray-900">
             <span>Total</span>
             <span>Rs. {total}</span>
           </div>
